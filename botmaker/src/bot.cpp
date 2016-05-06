@@ -8,50 +8,13 @@
 void Sleep(int);
 
 Bot::Bot(int nc, POINT *ps, int *ct, bool *tac, int nm, std::string *ms, int *tt, bool *eat, int r) {
-	int i;
 	
-	numClicks = (nc > 0) ? nc : 0;
+	numClicks = numMsgs = repeat = 0;
+	points = NULL;
+	clickTimes = typeTimes = NULL;
+	typeAfterClick = enterAfterType = NULL;
+	msgs = NULL;
 	
-	if(numClicks > 0) {
-		points = new POINT[numClicks];
-		for(i = 0; i < numClicks; i++) {
-			points[i].x = (ps) ? ps[i].x : 0;
-			points[i].y = (ps) ? ps[i].y : 0;
-		}
-		
-		clickTimes = new int[numClicks];
-		for(i = 0; i < numClicks; i++) 
-			clickTimes[i] = (ct) ? ct[i] : 1;
-
-		typeAfterClick = new bool[numClicks];
-		for(i = 0; i < numClicks; i++) 
-			typeAfterClick[i] = (tac) ? tac[i] : false;
-	
-	} else {
-		points = NULL;
-		typeAfterClick = NULL;
-	}
-	
-	numMsgs = (nm > 0) ? nm : 0;
-	
-	if(numMsgs > 0) {
-		msgs = new std::string[nm];
-		for(i = 0; i < numMsgs; i++)
-			msgs[i] = (ms) ? ms[i] : "";
-		
-		typeTimes = new int[numMsgs];
-		for(i = 0; i < numMsgs; i++)
-			typeTimes[i] = (tt) ? tt[i] : 1;
-
-		enterAfterType = new bool[numMsgs];
-		for(i = 0; i < numMsgs; i++) 
-			enterAfterType[i] = (eat) ? eat[i] : false;
-	} else {
-		msgs = NULL;
-		enterAfterType = NULL;
-	}
-	
-	repeat = (r > 0) ? r : 0;
 }
 
 Bot::Bot(const Bot &copy) {
@@ -141,17 +104,39 @@ void Bot::SetNumClicks(int nc) {
 	
 	if(nc > 0) {
 		int i;
+
 		
-		POINT *pTmp = new POINT[nc];
-		for(i = 0; i < numClicks; i++) {
-			pTmp[i].x = points[i].x;
-			pTmp[i].y = points[i].y;
+		POINT *pTmp = new POINT[nc]();
+		if(points) {
+			for(i = 0; i < numClicks; i++) {
+				pTmp[i].x = points[i].x;
+				pTmp[i].y = points[i].y;
+			}
+			delete[] points;
 		}
-		delete[] points;
 		points = pTmp;
 		pTmp = NULL;
 		
+		int *ctTmp = new int[nc]();
+		if(clickTimes) {
+			for(i = 0; i < numClicks; i++) {
+				ctTmp[i] = clickTimes[i];	
+			}
+			delete[] clickTimes;
+		}
+		clickTimes = ctTmp;
+		ctTmp = NULL;
 		
+		
+		bool *tacTmp = new bool[nc]();
+		if(typeAfterClick) {
+			for(i = 0; i < numClicks; i++) {
+				tacTmp[i] = typeAfterClick[i];
+			}
+			delete[] typeAfterClick;
+		}
+		typeAfterClick = tacTmp;
+		tacTmp = NULL;
 		
 		numClicks = nc;
 	} else {
@@ -173,7 +158,7 @@ void Bot::SetNumClicks(int nc) {
 }
 
 POINT Bot::GetPoint(int index) const {
-	if(index > 0 && index < numClicks) 
+	if(index >= 0 && index < numClicks) 
 		return points[index];
 	
 	POINT p;
@@ -225,32 +210,35 @@ void Bot::SetNumMsgs(int nm) {
 		
 		int i;
 		
+		std::string *mtmp = new std::string[nm]();
 		if(msgs) {
-			std::string *mtmp = new std::string[nm]();
 			for(i = 0; i < ((numMsgs > nm) ? nm : numMsgs); i++) {
 				mtmp[i] = msgs[i];
 			}
 			delete[] msgs;
-			msgs = mtmp;
 		}
-		
+		msgs = mtmp;
+		mtmp = NULL;
+
+		int *ttmp = new int[nm]();
 		if(typeTimes) {
-			int *ttmp = new int[nm]();
 			for(i = 0; i < ((numMsgs > nm) ? nm : numMsgs); i++) {
 				ttmp[i] = typeTimes[i];
 			}
 			delete[] typeTimes;
-			typeTimes = ttmp;
 		}
-		
+		typeTimes = ttmp;
+		ttmp = NULL;
+
+		bool *btmp = new bool[nm]();
 		if(enterAfterType) {
-			bool *btmp = new bool[nm]();
 			for(i = 0; i < ((numMsgs > nm) ? nm : numMsgs); i++) {
 				btmp[i] = enterAfterType[i];
 			}
 			delete[] enterAfterType;
-			enterAfterType = btmp;
 		}
+		enterAfterType = btmp;
+		btmp = NULL;
 		
 		numMsgs = nm;
 		

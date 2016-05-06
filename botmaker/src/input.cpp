@@ -5,6 +5,7 @@
 //======================================================================================================
 
 #include <iostream>
+#include <string>
 #include "headers/input.h"
 
 //Function: GetInput
@@ -79,6 +80,21 @@ void GetInput(float &value, const char *msg, float min, float max) {
 		
 		std::cin.clear(); //Clear the bad flag
 		std::cin.ignore(1000, '\n'); //Clear the rest of the line
+	}
+}
+
+
+//Function: GetInput
+//Purpose: Get a string from stdin and error check
+//Parameters:
+//	std::string &value: the value to store the string in
+//	const char *msg: The message to display to the user
+void GetInput(std::string &value, const char *msg) {
+	while(true) {
+		std::cout << msg;
+		std::cin.clear();
+		std::cin.ignore(1000, '\n');
+		if((std::cin >> value)) break;
 	}
 }
 

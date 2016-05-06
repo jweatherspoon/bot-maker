@@ -37,11 +37,11 @@ void GetInput(double &value, const char *msg, double min = -1e99, double max = 1
 //	float max: The maximum value the input can take
 void GetInput(float &value, const char *msg, float min = -1e99, float max = 1e99);
 
-//Function: GetStr
-//Purpose: Get a string from stdin and return a pointer to it
+//Function: GetInput
+//Purpose: Get a string from stdin and error check
 //Parameters:
-//	const char *msg: A prompt for input
-//Return value: char *str: The string read from stdin
-char *GetStr(const char *msg);
+//	std::string &value: the value to store the string in
+//	const char *msg: The message to display to the user
+void GetInput(std::string &value, const char *msg);
 
 #endif

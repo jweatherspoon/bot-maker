@@ -106,12 +106,15 @@ void Type(const char *msg) {
 	}
 }
 
+int GetKeyCode(char ch, bool &needShift) {
+	if((ch >= 'A' && ch <= 'Z') || (ch >= '!' && ch <= '+' && ch != '\'') ||
+	   ch == ':' || ch == '<' || (ch >= '>' && ch <= '@') || (ch >= '^' && ch <= '_') ||
+	   (ch >= '{' && ch <= '~')) needShift = true;
+	else needShift = false;
+	return ch;
+}
+
 void Type(char ch) {
-	bool shift = false;
-	if(ch >= 97 && ch <= 122) {
-		ch -= 32;
-		shift = true;
-	}
 	
 	Display *dpy = XOpenDisplay(0);
 	Window wRoot = RootWindow(dpy, 0);
@@ -133,14 +136,34 @@ void Type(char ch) {
 	event.xkey.x_root = 1;
 	event.xkey.y_root = 1;
 	event.xkey.same_screen = true;
-	event.xkey.keycode = XKeysymToKeycode(dpy, ch);
 	event.xkey.state = 0;
 	
+	bool shift;
+	int kc = GetKeyCode(ch, shift);
+	
+	if(shift) {
+		event.xkey.keycode = XKeysymToKeycode(dpy, 0xFFE1); //Left shift
+		XSendEvent(dpy, wFocus, true, 0xFFE1, &event);
+		XFlush(dpy);
+	}
+	
+	event.xkey.keycode = XKeysymToKeycode(dpy, ch);
 	XSendEvent(dpy, wFocus, true, ch, &event);
+	
+	XFlush(dpy);
 	
 	event.type = KeyRelease;
 	
+	if(shift) {
+		event.xkey.keycode = XKeysymToKeycode(dpy, 0xFFE1); //Left shift
+		XSendEvent(dpy, wFocus, true, 0xFFE1, &event);
+		XFlush(dpy);
+	}
+	
+	event.xkey.keycode = XKeysymToKeycode(dpy, ch);
 	XSendEvent(dpy, wFocus, true, ch, &event);
+	
+	XFlush(dpy);
 	
 	XCloseDisplay(dpy);
 	
